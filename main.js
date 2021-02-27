@@ -2,6 +2,7 @@ const { app, BrowserWindow, Menu, MenuItem } = require('electron')
 const fs = require('fs')
 
 let wins = []
+let selectWin = null
 
 const menu = new Menu()
 menu.append(new MenuItem({
@@ -14,14 +15,25 @@ menu.append(new MenuItem({
         const files = fs.readdirSync(`${__dirname}/posts`)
         const filepath = `${__dirname}/posts/${files.length}.txt`
         fs.writeFileSync(filepath, "")
-        wins.push(createWindow(`${files.length}.txt`, files.length))
+        wins.push(createWindow(`${files.length}.txt`, wins.length))
       }
     },
     {
       label: "付箋を捨てる",
       accelerator: 'Cmd+W',
       click: () => {
-        wins[wins.length - 1].close()
+        selectWin.close()
+      }
+    }, {
+      label: "付箋を選択",
+      accelerator: "Cmd+A",
+      click: () => {
+        const selectIndex = wins.findIndex(win => win.id === selectWin.id)
+        if ((wins.length - 1) > selectIndex) {
+          wins[selectIndex + 1].focus()
+        } else {
+          wins[0].focus()
+        }
       }
     }
   ]
@@ -48,8 +60,17 @@ function createWindow(file, i) {
       filepath: `${POST_DIR}/${file}`, content: fs.readFileSync(`${POST_DIR}/${file}`, "utf-8")
     })
   })
+
   const trashfile = fs.readdirSync(TRASH_DIR)
-  win.addListener('close', () => { fs.renameSync(`${POST_DIR}/${file}`, `${TRASH_DIR}/${trashfile.length}.txt`) })
+  win.addListener("closed", () => {
+    wins = wins.filter(win => !win.isDestroyed())
+    fs.renameSync(`${POST_DIR}/${file}`, `${TRASH_DIR}/${trashfile.length}.txt`)
+  })
+
+  win.addListener('focus', ({ sender }) => {
+    selectWin = sender
+  })
+  win.focus()
   return win
 }
 
