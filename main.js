@@ -24,7 +24,8 @@ menu.append(new MenuItem({
       click: () => {
         selectWin.close()
       }
-    }, {
+    }, 
+    {
       label: "付箋を選択",
       accelerator: "Cmd+A",
       click: () => {
@@ -35,6 +36,11 @@ menu.append(new MenuItem({
           wins[0].focus()
         }
       }
+    },
+    {
+      label: "終了する",
+      accelerator: "Cmd+Q",
+      click: () => app.quit()
     }
   ]
 }))
