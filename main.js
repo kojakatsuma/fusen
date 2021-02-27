@@ -3,6 +3,27 @@ const fs = require('fs')
 
 const menu = new Menu()
 
+const POST_DIR = `${__dirname}/posts`
+
+function createWindow(file, i) {
+  const win = new BrowserWindow({
+    width: 200,
+    height: 200,
+    x: i * 200,
+    y: 0,
+    webPreferences: {
+      nodeIntegration: true
+    }
+  })
+  win.loadFile('index.html')
+  win.webContents.addListener('did-finish-load', () => {
+    win.webContents.send('load-post', {
+      filepath: `${POST_DIR}/${file}`, content: fs.readFileSync(`${POST_DIR}/${file}`, "utf-8")
+    })
+  })
+}
+
+
 menu.append(new MenuItem({
   label: "Menu",
   submenu: [
@@ -13,19 +34,7 @@ menu.append(new MenuItem({
         const files = fs.readdirSync(`${__dirname}/posts`)
         const filepath = `${__dirname}/posts/${files.length}.txt`
         fs.writeFileSync(filepath, "")
-        const win = new BrowserWindow({
-          width: 200,
-          height: 200,
-          x: files.length * 200,
-          y: 0,
-          webPreferences: {
-            nodeIntegration: true
-          }
-        })
-        win.loadFile('index.html')
-        win.webContents.addListener('did-finish-load', () => {
-          win.webContents.send('load-post', { filepath, content: "" })
-        })
+        createWindow(`${files.length}.txt`, files.length)
       }
     }
   ]
@@ -33,32 +42,16 @@ menu.append(new MenuItem({
 
 Menu.setApplicationMenu(menu)
 
-function createWindow() {
+function init() {
   let files = fs.readdirSync(`${__dirname}/posts`)
   if (!files.length) {
     fs.writeFileSync(`${__dirname}/posts/${files.length}.txt`, "")
     files = fs.readdirSync(`${__dirname}/posts`)
   }
-
-  files.forEach((file, i) => {
-    const win = new BrowserWindow({
-      width: 200,
-      height: 200,
-      x: i * 200,
-      y: 0,
-      webPreferences: {
-        nodeIntegration: true
-      }
-    })
-    win.loadFile('index.html')
-    win.webContents.addListener('did-finish-load', () => {
-      win.webContents.send('load-post', { 
-        filepath: `${__dirname}/posts/${file}`, content: fs.readFileSync(`${__dirname}/posts/${file}`, 'utf-8') })
-    })
-  })
+  files.forEach(createWindow)
 }
 
-app.whenReady().then(createWindow)
+app.whenReady().then(init)
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -68,6 +61,8 @@ app.on('window-all-closed', () => {
 
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow()
+    init()
   }
 })
+
+
