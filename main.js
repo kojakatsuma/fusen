@@ -2,6 +2,22 @@ const { app, BrowserWindow, Menu, MenuItem } = require('electron')
 const fs = require('fs')
 
 const menu = new Menu()
+menu.append(new MenuItem({
+  label: "Menu",
+  submenu: [
+    {
+      label: "file",
+      accelerator: 'Cmd+N',
+      click: () => {
+        const files = fs.readdirSync(`${__dirname}/posts`)
+        const filepath = `${__dirname}/posts/${files.length}.txt`
+        fs.writeFileSync(filepath, "")
+        createWindow(`${files.length}.txt`, files.length)
+      }
+    }
+  ]
+}))
+Menu.setApplicationMenu(menu)
 
 const POST_DIR = `${__dirname}/posts`
 
@@ -22,25 +38,6 @@ function createWindow(file, i) {
     })
   })
 }
-
-
-menu.append(new MenuItem({
-  label: "Menu",
-  submenu: [
-    {
-      label: "file",
-      accelerator: 'Cmd+N',
-      click: () => {
-        const files = fs.readdirSync(`${__dirname}/posts`)
-        const filepath = `${__dirname}/posts/${files.length}.txt`
-        fs.writeFileSync(filepath, "")
-        createWindow(`${files.length}.txt`, files.length)
-      }
-    }
-  ]
-}))
-
-Menu.setApplicationMenu(menu)
 
 function init() {
   let files = fs.readdirSync(`${__dirname}/posts`)
