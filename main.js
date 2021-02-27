@@ -1,18 +1,27 @@
 const { app, BrowserWindow, Menu, MenuItem } = require('electron')
 const fs = require('fs')
 
+let wins = []
+
 const menu = new Menu()
 menu.append(new MenuItem({
   label: "Menu",
   submenu: [
     {
-      label: "file",
+      label: "新しい付箋",
       accelerator: 'Cmd+N',
       click: () => {
         const files = fs.readdirSync(`${__dirname}/posts`)
         const filepath = `${__dirname}/posts/${files.length}.txt`
         fs.writeFileSync(filepath, "")
-        createWindow(`${files.length}.txt`, files.length)
+        wins.push(createWindow(`${files.length}.txt`, files.length))
+      }
+    },
+    {
+      label: "付箋を捨てる",
+      accelerator: 'Cmd+W',
+      click: () => {
+        wins[wins.length - 1].close()
       }
     }
   ]
@@ -20,6 +29,8 @@ menu.append(new MenuItem({
 Menu.setApplicationMenu(menu)
 
 const POST_DIR = `${__dirname}/posts`
+
+const TRASH_DIR = `${__dirname}/trash`
 
 function createWindow(file, i) {
   const win = new BrowserWindow({
@@ -37,15 +48,18 @@ function createWindow(file, i) {
       filepath: `${POST_DIR}/${file}`, content: fs.readFileSync(`${POST_DIR}/${file}`, "utf-8")
     })
   })
+  const trashfile = fs.readdirSync(TRASH_DIR)
+  win.addListener('close', () => { fs.renameSync(`${POST_DIR}/${file}`, `${TRASH_DIR}/${trashfile.length}.txt`) })
+  return win
 }
 
 function init() {
-  let files = fs.readdirSync(`${__dirname}/posts`)
+  let files = fs.readdirSync(POST_DIR)
   if (!files.length) {
-    fs.writeFileSync(`${__dirname}/posts/${files.length}.txt`, "")
-    files = fs.readdirSync(`${__dirname}/posts`)
+    fs.writeFileSync(`${POST_DIR}/${files.length}.txt`, "")
+    files = fs.readdirSync(POST_DIR)
   }
-  files.forEach(createWindow)
+  wins = wins.concat(files.map(createWindow))
 }
 
 app.whenReady().then(init)
