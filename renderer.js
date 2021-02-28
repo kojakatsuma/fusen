@@ -12,7 +12,6 @@ ipcRenderer.on('load-post', (_e, m) => {
 })
 
 ipcRenderer.on('change-fontsize', (_e, setting) => {
-  console.log(setting)
   textarea.style.fontSize = `${setting.fontSize}px`
 })
 
