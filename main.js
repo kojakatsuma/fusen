@@ -102,7 +102,9 @@ function createWindow(file, i) {
     selectWin = sender
   })
   win.focus()
-  win.webContents.openDevTools({ mode: "detach" })
+  if (!app.isPackaged) {
+    win.webContents.openDevTools({ mode: "detach" })
+  }
   return win
 }
 
