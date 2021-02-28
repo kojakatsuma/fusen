@@ -8,8 +8,18 @@
       content="script-src 'self' 'unsafe-inline';"
     />
   </head>
-  <body>
-    <textarea autofocus style="outline: none; resize: none; border-width: 0ch; height: 150px; width: 180px;" id="post"></textarea>
+  <body style="-webkit-app-region: drag;">
+    <textarea
+      autofocus
+      style="
+        margin-top: 20px;
+        /* outline: none; */
+        /* resize: none; */
+        border-width: 0ch;
+        -webkit-app-region: no-drag;
+      "
+      id="post"
+    ></textarea>
     <script src="renderer.js"></script>
   </body>
 </html>

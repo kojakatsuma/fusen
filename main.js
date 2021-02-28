@@ -93,7 +93,7 @@ const TRASH_DIR = `${__dirname}/trash`
 
 function createWindow(file, i) {
   const win = new BrowserWindow({
-    frame: false,
+    titleBarStyle: "hidden",
     width: 200,
     height: 200,
     x: i * 200,
@@ -102,7 +102,9 @@ function createWindow(file, i) {
       nodeIntegration: true
     }
   })
+
   win.loadFile('index.html')
+
   win.webContents.addListener('did-finish-load', () => {
     win.webContents.send('load-post', {
       filepath: `${POST_DIR}/${file}`,
@@ -120,6 +122,7 @@ function createWindow(file, i) {
   win.addListener('focus', ({ sender }) => {
     selectWin = sender
   })
+
   win.focus()
   if (!app.isPackaged) {
     win.webContents.openDevTools({ mode: "detach" })
