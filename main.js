@@ -93,6 +93,7 @@ const TRASH_DIR = `${__dirname}/trash`
 
 function createWindow(file, i) {
   const win = new BrowserWindow({
+    frame: false,
     width: 200,
     height: 200,
     x: i * 200,
