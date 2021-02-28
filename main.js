@@ -6,7 +6,6 @@ if (!app.isPackaged) {
 }
 
 let wins = []
-let selectWin = null
 
 const menu = new Menu()
 menu.append(new MenuItem(
@@ -31,21 +30,22 @@ menu.append(new MenuItem({
         const files = fs.readdirSync(`${__dirname}/posts`)
         const filepath = `${__dirname}/posts/${files.length}.txt`
         fs.writeFileSync(filepath, "")
-        wins.push(createWindow(`${files.length}.txt`, wins.length))
+        const win = createWindow(`${files.length}.txt`, wins.length)
+        wins.push(win)
       }
     },
     {
       label: "付箋を捨てる",
       accelerator: 'Cmd+W',
-      click: () => {
-        selectWin.close()
+      click: (_, target) => {
+        if (target) target.close()
       }
     },
     {
       label: "付箋を選択",
       accelerator: "Cmd+D",
-      click: () => {
-        const selectIndex = wins.findIndex(win => win.id === selectWin.id)
+      click: (_, target) => {
+        const selectIndex = wins.findIndex(win => win.id === target.id)
         if ((wins.length - 1) > selectIndex) {
           wins[selectIndex + 1].focus()
         } else {
@@ -56,7 +56,7 @@ menu.append(new MenuItem({
     {
       label: "全選択",
       accelerator: "Cmd+A",
-      click: () => selectWin.webContents.send('all-select', {})
+      click: (_, target) => target.webContents.send('all-select', {})
     }
   ]
 }))
@@ -106,6 +106,8 @@ function createWindow(file, i) {
   win.loadFile('index.html')
 
   win.webContents.addListener('did-finish-load', () => {
+    if (win.isDestroyed()) return;
+
     win.webContents.send('load-post', {
       filepath: `${POST_DIR}/${file}`,
       content: fs.readFileSync(`${POST_DIR}/${file}`, "utf-8"),
@@ -114,18 +116,24 @@ function createWindow(file, i) {
   })
 
   const trashfile = fs.readdirSync(TRASH_DIR)
-  win.addListener("closed", () => {
-    wins = wins.filter(win => !win.isDestroyed())
-    fs.renameSync(`${POST_DIR}/${file}`, `${TRASH_DIR}/${trashfile.length}.txt`)
-  })
 
-  win.addListener('focus', ({ sender }) => {
-    selectWin = sender
+  win.addListener("close", ({ sender }) => {
+    const selectIndex = wins.findIndex(win => win.id === sender.id)
+    wins = wins.filter(win => win.id !== sender.id)
+    fs.renameSync(`${POST_DIR}/${file}`, `${TRASH_DIR}/${trashfile.length}.txt`)
+    if (!selectIndex) {
+      return;
+    }
+    if (wins.length >= selectIndex) {
+      wins[selectIndex + 1].focus()
+    } else {
+      wins[0].focus()
+    }
   })
 
   win.focus()
   if (!app.isPackaged) {
-    win.webContents.openDevTools({ mode: "detach" })
+    // win.webContents.openDevTools({ mode: "detach" })
   }
   return win
 }
@@ -142,7 +150,7 @@ function init() {
     fs.writeFileSync(`${POST_DIR}/${files.length}.txt`, "")
     files = fs.readdirSync(POST_DIR)
   }
-  wins = wins.concat(files.map(createWindow))
+  wins = wins.concat(files.map((file, i) => createWindow(file, i)))
 }
 
 app.whenReady().then(init)
