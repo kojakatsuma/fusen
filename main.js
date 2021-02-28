@@ -5,8 +5,20 @@ let wins = []
 let selectWin = null
 
 const menu = new Menu()
+menu.append(new MenuItem(
+  {
+    submenu: [
+      {
+        label: "終了する",
+        accelerator: "Cmd+Q",
+        click: () => app.quit()
+      }
+    ]
+  }
+));
+
 menu.append(new MenuItem({
-  label: "Menu",
+  label: "編集",
   submenu: [
     {
       label: "新しい付箋",
@@ -24,7 +36,7 @@ menu.append(new MenuItem({
       click: () => {
         selectWin.close()
       }
-    }, 
+    },
     {
       label: "付箋を選択",
       accelerator: "Cmd+A",
@@ -36,14 +48,25 @@ menu.append(new MenuItem({
           wins[0].focus()
         }
       }
-    },
-    {
-      label: "終了する",
-      accelerator: "Cmd+Q",
-      click: () => app.quit()
     }
   ]
 }))
+
+menu.append(new MenuItem({
+  label: "設定",
+  submenu: [
+    {
+      label: "文字を大きくする",
+      accelerator: "Cmd+;",
+      click: () => {
+        const setting = JSON.parse(fs.readFileSync(`${__dirname}/setting.json`, 'utf-8'))
+        selectWin.webContents.send('change-fontsize', { fontSize: setting.fontSize + 1 })
+        fs.writeFileSync(`${__dirname}/setting.json`, JSON.stringify({ ...setting, fontSize: setting.fontSize + 1 }, null, 2))
+      }
+    }
+  ]
+}))
+
 Menu.setApplicationMenu(menu)
 
 const POST_DIR = `${__dirname}/posts`
@@ -63,7 +86,9 @@ function createWindow(file, i) {
   win.loadFile('index.html')
   win.webContents.addListener('did-finish-load', () => {
     win.webContents.send('load-post', {
-      filepath: `${POST_DIR}/${file}`, content: fs.readFileSync(`${POST_DIR}/${file}`, "utf-8")
+      filepath: `${POST_DIR}/${file}`,
+      content: fs.readFileSync(`${POST_DIR}/${file}`, "utf-8"),
+      setting: JSON.parse(fs.readFileSync(`${__dirname}/setting.json`, 'utf-8'))
     })
   })
 
@@ -77,6 +102,7 @@ function createWindow(file, i) {
     selectWin = sender
   })
   win.focus()
+  win.webContents.openDevTools({ mode: "detach" })
   return win
 }
 

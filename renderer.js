@@ -8,6 +8,12 @@ let filepath = ""
 ipcRenderer.on('load-post', (_e, m) => {
   textarea.value = m.content
   filepath = m.filepath
+  textarea.style.fontSize = `${m.setting.fontSize}px`
+})
+
+ipcRenderer.on('change-fontsize', (_e, setting) => {
+  console.log(setting)
+  textarea.style.fontSize = `${setting.fontSize}px`
 })
 
 textarea.addEventListener('change', (e) => {
