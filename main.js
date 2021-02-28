@@ -26,11 +26,12 @@ menu.append(new MenuItem({
     {
       label: "新しい付箋",
       accelerator: 'Cmd+N',
-      click: () => {
+      click: (_, target) => {
         const files = fs.readdirSync(`${__dirname}/posts`)
         const filepath = `${__dirname}/posts/${files.length}.txt`
         fs.writeFileSync(filepath, "")
-        const win = createWindow(`${files.length}.txt`, wins.length)
+        const [x] = target.getPosition()
+        const win = createWindow(`${files.length}.txt`, x + 200)
         wins.push(win)
       }
     },
@@ -91,12 +92,12 @@ const POST_DIR = `${__dirname}/posts`
 
 const TRASH_DIR = `${__dirname}/trash`
 
-function createWindow(file, i) {
+function createWindow(file, x) {
   const win = new BrowserWindow({
     titleBarStyle: "hidden",
     width: 200,
     height: 200,
-    x: i * 200,
+    x: x,
     y: 0,
     webPreferences: {
       nodeIntegration: true
@@ -125,7 +126,9 @@ function createWindow(file, i) {
       return;
     }
     if (wins.length >= selectIndex) {
-      wins[selectIndex + 1].focus()
+      if (wins[selectIndex + 1]) {
+        wins[selectIndex + 1].focus()
+      }
     } else {
       wins[0].focus()
     }
@@ -150,7 +153,7 @@ function init() {
     fs.writeFileSync(`${POST_DIR}/${files.length}.txt`, "")
     files = fs.readdirSync(POST_DIR)
   }
-  wins = wins.concat(files.map((file, i) => createWindow(file, i)))
+  wins = wins.concat(files.map((file, i) => createWindow(file, i * 200)))
 }
 
 app.whenReady().then(init)
