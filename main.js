@@ -56,9 +56,11 @@ menu.append(new MenuItem({
     },
     {
       label: "全選択",
-      accelerator: "Cmd+A",
-      click: (_, target) => target.webContents.send('all-select', {})
-    }
+      accelerator: "CmdOrCtrl+A", selector: "selectAll:"
+    }, 
+    { label: "カット", accelerator: "CmdOrCtrl+X", selector: "cut:" },
+    { label: "コピー", accelerator: "CmdOrCtrl+C", selector: "copy:" },
+    { label: "貼り付け", accelerator: "CmdOrCtrl+V", selector: "paste:" },
   ]
 }))
 

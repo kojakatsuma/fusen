@@ -22,10 +22,6 @@ textarea.addEventListener('change', (e) => {
   fs.writeFileSync(filepath, value)
 })
 
-ipcRenderer.on('all-select', () => {
-  textarea.select()
-})
-
 window.addEventListener('resize', () => {
   textarea.style.height = `${window.innerHeight}px`
   textarea.style.width = `${window.innerWidth}px`
