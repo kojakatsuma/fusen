@@ -127,6 +127,12 @@ function createWindow(file, i) {
 }
 
 function init() {
+  if (!fs.existsSync(POST_DIR)) {
+    fs.mkdirSync(POST_DIR)
+  }
+  if (!fs.existsSync(TRASH_DIR)) {
+    fs.mkdirSync(TRASH_DIR)
+  }
   let files = fs.readdirSync(POST_DIR)
   if (!files.length) {
     fs.writeFileSync(`${POST_DIR}/${files.length}.txt`, "")
