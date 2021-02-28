@@ -2,4 +2,3 @@ node_modules
 out
 posts/*
 trash/*
-!0.txt
