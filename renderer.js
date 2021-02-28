@@ -9,8 +9,6 @@ ipcRenderer.on('load-post', (_e, m) => {
   textarea.value = m.content
   filepath = m.filepath
   textarea.style.fontSize = `${m.setting.fontSize}px`
-  textarea.style.height = `${window.innerHeight}px`
-  textarea.style.width = `${window.innerWidth}px`
 })
 
 ipcRenderer.on('change-fontsize', (_e, setting) => {
@@ -22,7 +20,3 @@ textarea.addEventListener('change', (e) => {
   fs.writeFileSync(filepath, value)
 })
 
-window.addEventListener('resize', () => {
-  textarea.style.height = `${window.innerHeight}px`
-  textarea.style.width = `${window.innerWidth}px`
-})
