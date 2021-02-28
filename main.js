@@ -39,7 +39,7 @@ menu.append(new MenuItem({
     },
     {
       label: "付箋を選択",
-      accelerator: "Cmd+A",
+      accelerator: "Cmd+D",
       click: () => {
         const selectIndex = wins.findIndex(win => win.id === selectWin.id)
         if ((wins.length - 1) > selectIndex) {
@@ -60,7 +60,7 @@ menu.append(new MenuItem({
       accelerator: "Cmd+;",
       click: () => {
         const setting = JSON.parse(fs.readFileSync(`${__dirname}/setting.json`, 'utf-8'))
-        selectWin.webContents.send('change-fontsize', { fontSize: setting.fontSize + 1 })
+        wins.forEach(win => win.webContents.send('change-fontsize', { fontSize: setting.fontSize + 1 }))
         fs.writeFileSync(`${__dirname}/setting.json`, JSON.stringify({ ...setting, fontSize: setting.fontSize + 1 }, null, 2))
       }
     }
