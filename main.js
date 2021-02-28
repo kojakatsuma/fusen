@@ -1,6 +1,10 @@
 const { app, BrowserWindow, Menu, MenuItem } = require('electron')
 const fs = require('fs')
 
+if (!app.isPackaged) {
+  require('electron-reload')(__dirname);
+}
+
 let wins = []
 let selectWin = null
 
@@ -48,6 +52,11 @@ menu.append(new MenuItem({
           wins[0].focus()
         }
       }
+    },
+    {
+      label: "全選択",
+      accelerator: "Cmd+A",
+      click: () => selectWin.webContents.send('all-select', {})
     }
   ]
 }))
@@ -62,6 +71,15 @@ menu.append(new MenuItem({
         const setting = JSON.parse(fs.readFileSync(`${__dirname}/setting.json`, 'utf-8'))
         wins.forEach(win => win.webContents.send('change-fontsize', { fontSize: setting.fontSize + 1 }))
         fs.writeFileSync(`${__dirname}/setting.json`, JSON.stringify({ ...setting, fontSize: setting.fontSize + 1 }, null, 2))
+      }
+    },
+    {
+      label: "文字を小さくする",
+      accelerator: "Cmd+:",
+      click: () => {
+        const setting = JSON.parse(fs.readFileSync(`${__dirname}/setting.json`, 'utf-8'))
+        wins.forEach(win => win.webContents.send('change-fontsize', { fontSize: setting.fontSize - 1 }))
+        fs.writeFileSync(`${__dirname}/setting.json`, JSON.stringify({ ...setting, fontSize: setting.fontSize - 1 }, null, 2))
       }
     }
   ]

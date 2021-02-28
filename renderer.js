@@ -20,3 +20,7 @@ textarea.addEventListener('change', (e) => {
   const value = e.target.value
   fs.writeFileSync(filepath, value)
 })
+
+ipcRenderer.on('all-select',() => {
+  textarea.select()
+})
