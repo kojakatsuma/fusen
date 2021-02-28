@@ -172,4 +172,9 @@ app.on('activate', () => {
   }
 })
 
+app.on('before-quit', (e) => {
+  e.preventDefault()
+  app.exit()
+})
+
 
