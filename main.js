@@ -1,7 +1,7 @@
 const { app, BrowserWindow, Menu, MenuItem } = require('electron')
 const fs = require('fs')
 
-const POST_DIR = `${process.env.HOME}/.posts`
+const POST_DIR = app.isPackaged ? `${process.env.HOME}/.posts` : `${__dirname}/posts`
 
 const TRASH_DIR = `${__dirname}/trash`
 
