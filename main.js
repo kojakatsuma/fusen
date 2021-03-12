@@ -1,6 +1,10 @@
 const { app, BrowserWindow, Menu, MenuItem } = require('electron')
 const fs = require('fs')
 
+const POST_DIR = `${__dirname}/posts`
+
+const TRASH_DIR = `${__dirname}/trash`
+
 if (!app.isPackaged) {
   require('electron-reload')(__dirname);
 }
@@ -27,8 +31,8 @@ menu.append(new MenuItem({
       label: "新しい付箋",
       accelerator: 'Cmd+N',
       click: (_, target) => {
-        const files = fs.readdirSync(`${__dirname}/posts`)
-        const filepath = `${__dirname}/posts/${files.length}.txt`
+        const files = fs.readdirSync(POST_DIR)
+        const filepath = `${POST_DIR}/${files.length}.txt`
         fs.writeFileSync(filepath, "")
         const [x] = target.getPosition()
         const win = createWindow(`${files.length}.txt`, x + 200)
@@ -89,10 +93,6 @@ menu.append(new MenuItem({
 }))
 
 Menu.setApplicationMenu(menu)
-
-const POST_DIR = `${__dirname}/posts`
-
-const TRASH_DIR = `${__dirname}/trash`
 
 function createWindow(file, x) {
   const win = new BrowserWindow({
