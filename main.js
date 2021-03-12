@@ -1,7 +1,7 @@
 const { app, BrowserWindow, Menu, MenuItem } = require('electron')
 const fs = require('fs')
 
-const POST_DIR = `${__dirname}/posts`
+const POST_DIR = `${process.env.HOME}/.posts`
 
 const TRASH_DIR = `${__dirname}/trash`
 
@@ -61,7 +61,7 @@ menu.append(new MenuItem({
     {
       label: "全選択",
       accelerator: "CmdOrCtrl+A", selector: "selectAll:"
-    }, 
+    },
     { label: "カット", accelerator: "CmdOrCtrl+X", selector: "cut:" },
     { label: "コピー", accelerator: "CmdOrCtrl+C", selector: "copy:" },
     { label: "貼り付け", accelerator: "CmdOrCtrl+V", selector: "paste:" },
@@ -150,7 +150,7 @@ function init() {
   if (!fs.existsSync(TRASH_DIR)) {
     fs.mkdirSync(TRASH_DIR)
   }
-  let files = fs.readdirSync(POST_DIR)
+  let files = fs.readdirSync(POST_DIR).filter(file => file !== ".DS_Store")
   if (!files.length) {
     fs.writeFileSync(`${POST_DIR}/${files.length}.txt`, "")
     files = fs.readdirSync(POST_DIR)
