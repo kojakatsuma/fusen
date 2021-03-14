@@ -1,12 +1,14 @@
 const { app, BrowserWindow, Menu, MenuItem } = require('electron')
 const fs = require('fs')
 
-const POST_DIR = app.isPackaged ? `${process.env.HOME}/.posts` : `${__dirname}/posts`
+const POST_DIR = app.isPackaged ? `${process.env.HOME}/.posts` : `${process.env.HOME}/.posts-dev`
 
 const TRASH_DIR = `${__dirname}/trash`
 
 if (!app.isPackaged) {
-  require('electron-reload')(__dirname);
+  require('electron-reload')(__dirname, {
+    electron: require('${__dirname}/../../node_modules/electron')
+  });
 }
 
 let wins = []
@@ -138,7 +140,7 @@ function createWindow(file, x) {
 
   win.focus()
   if (!app.isPackaged) {
-    // win.webContents.openDevTools({ mode: "detach" })
+    win.webContents.openDevTools({ mode: "detach" })
   }
   return win
 }
