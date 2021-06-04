@@ -1,13 +1,7 @@
 const { app, BrowserWindow, Menu, MenuItem } = require('electron')
-const fs = require('fs')
-
-const POST_DIR = app.isPackaged ? `${process.env.HOME}/.posts` : `${__dirname}/posts`
-
-const TRASH_DIR = `${__dirname}/trash`
-
-if (!app.isPackaged) {
-  require('electron-reload')(__dirname);
-}
+const fs = require('fs');
+const { POST_DIR, TRASH_DIR } = require("./constant");
+const { getSetting, toggleMarkdown } = require("./setting");
 
 let wins = []
 
@@ -31,6 +25,9 @@ menu.append(new MenuItem({
       label: "新しい付箋",
       accelerator: 'Cmd+N',
       click: (_, target) => {
+        if (!target) {
+          return;
+        }
         const files = fs.readdirSync(POST_DIR)
         const filepath = `${POST_DIR}/${files.length}.txt`
         fs.writeFileSync(filepath, "")
@@ -88,7 +85,15 @@ menu.append(new MenuItem({
         wins.forEach(win => win.webContents.send('change-fontsize', { fontSize: setting.fontSize - 1 }))
         fs.writeFileSync(`${__dirname}/setting.json`, JSON.stringify({ ...setting, fontSize: setting.fontSize - 1 }, null, 2))
       }
-    }
+    },
+    {
+      label: "makdownを変換する",
+      accelerator: "CmdOrCtrl+M",
+      click: (_, target) => {
+        const setting = toggleMarkdown(target.id)
+        target.webContents.send("toggle-markdown", setting.markdown)
+      }
+    },
   ]
 }))
 
@@ -110,11 +115,11 @@ function createWindow(file, x) {
 
   win.webContents.addListener('did-finish-load', () => {
     if (win.isDestroyed()) return;
-
+    const originSetting = getSetting()
     win.webContents.send('load-post', {
       filepath: `${POST_DIR}/${file}`,
       content: fs.readFileSync(`${POST_DIR}/${file}`, "utf-8"),
-      setting: JSON.parse(fs.readFileSync(`${__dirname}/setting.json`, 'utf-8'))
+      setting: originSetting
     })
   })
 
@@ -138,7 +143,7 @@ function createWindow(file, x) {
 
   win.focus()
   if (!app.isPackaged) {
-    // win.webContents.openDevTools({ mode: "detach" })
+    win.webContents.openDevTools({ mode: "detach" })
   }
   return win
 }
