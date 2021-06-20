@@ -1,7 +1,8 @@
-const { app, BrowserWindow, Menu, MenuItem } = require('electron')
+const { app, BrowserWindow, Menu, MenuItem, ipcMain } = require('electron')
 const fs = require('fs');
 const { POST_DIR, TRASH_DIR } = require("./constant");
 const { getSetting, toggleMarkdown } = require("./setting");
+const path = require('path')
 
 let wins = []
 
@@ -107,7 +108,9 @@ function createWindow(file, x) {
     x: x,
     y: 0,
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js')
     }
   })
 
@@ -183,3 +186,7 @@ app.on('before-quit', (e) => {
 })
 
 
+ipcMain.handle('saveText', (_e, data) => {
+  console.log(data.content)
+  fs.writeFileSync(data.filepath, data.content);
+})

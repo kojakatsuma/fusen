@@ -2,7 +2,11 @@
   "1": {
     "markdown": true
   },
+  "2": {
+    "markdown": true
+  },
   "all": {
     "fontSize": 18
-  }
+  },
+  "fontSize": 23
 }
