@@ -1,12 +1,12 @@
 {
   "1": {
-    "markdown": true
+    "markdown": false
   },
   "2": {
-    "markdown": true
+    "markdown": false
   },
   "all": {
     "fontSize": 18
   },
-  "fontSize": 23
+  "fontSize": 18
 }

@@ -13,6 +13,8 @@ ipcRenderer.on('load-post', (_e, m) => {
     textarea.value = m.content
     filepath = m.filepath
     textarea.style.fontSize = `${m.setting.fontSize}px`;
+    console.log(m.setting)
+    toggleMarkdown(m.setting.markdown)
 });
 
 ipcRenderer.on('change-fontsize', (_e, setting) => {
@@ -21,6 +23,10 @@ ipcRenderer.on('change-fontsize', (_e, setting) => {
 });
 
 ipcRenderer.on('toggle-markdown', (_e, markdown) => {
+    toggleMarkdown(markdown)
+})
+
+const toggleMarkdown = (markdown) => {
     const textarea = document.getElementById("post");
     if (markdown) {
         textarea.hidden = true
@@ -30,4 +36,4 @@ ipcRenderer.on('toggle-markdown', (_e, markdown) => {
     }
     textarea.hidden = false
     document.getElementById('markdown-preview').innerHTML = null
-})
+}

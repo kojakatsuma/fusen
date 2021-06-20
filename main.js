@@ -118,7 +118,7 @@ function createWindow(file, x) {
 
   win.webContents.addListener('did-finish-load', () => {
     if (win.isDestroyed()) return;
-    const originSetting = getSetting()
+    const originSetting = getSetting(win.id)
     win.webContents.send('load-post', {
       filepath: `${POST_DIR}/${file}`,
       content: fs.readFileSync(`${POST_DIR}/${file}`, "utf-8"),
