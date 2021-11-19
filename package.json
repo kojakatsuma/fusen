@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
-    "micromark": "^3.0.5"
+    "micromark": "^3.0.8"
   },
   "config": {
     "forge": {
